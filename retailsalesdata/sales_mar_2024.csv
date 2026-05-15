@@ -1,0 +1,9 @@
+transaction_id,date,product_name,category,region,quantity,unit_price,customer_id
+TXN019,2024-03-01,Laptop Pro X,Electronics,East,2,75000,C016
+TXN020,2024-03-01,Rice 5kg,Groceries,South,20,450,C017
+TXN021,2024-03-02,Smartphone Y,Electronics,North,2,28000,C018
+TXN022,2024-03-03,Cotton Kurta,Apparel,West,10,1200,C019
+TXN023,2024-03-04,Headphones Z,Electronics,South,8,3500,C020
+TXN024,2024-03-04,Wheat 10kg,Groceries,East,18,600,C021
+TXN025,2024-03-05,Silk Saree,Apparel,North,3,9500,C022
+TXN026,2024-03-05,Jeans Classic,Apparel,West,5,2500,C023

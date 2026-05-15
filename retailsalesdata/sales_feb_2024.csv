@@ -1,0 +1,9 @@
+transaction_id,date,product_name,category,region,quantity,unit_price,customer_id
+TXN011,2024-02-01,Smartphone Y,Electronics,South,3,28000,C010
+TXN012,2024-02-01,Cotton Kurta,Apparel,East,8,1200,C002
+TXN013,2024-02-02,Wheat 10kg,Groceries,North,12,600,C011
+TXN014,2024-02-03,Laptop Pro X,Electronics,West,1,75000,C012
+TXN015,2024-02-03,Silk Saree,Apparel,South,2,9500,C013
+TXN016,2024-02-04,Headphones Z,Electronics,North,6,3500,C014
+TXN017,2024-02-05,Cooking Oil 1L,Groceries,East,25,180,C003
+TXN018,2024-02-05,Jeans Classic,Apparel,West,4,2500,C015

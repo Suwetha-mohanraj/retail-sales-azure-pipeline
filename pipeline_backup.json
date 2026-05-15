@@ -1,0 +1,212 @@
+{
+    "name": "pipeline1pl_retail_sales_ingest",
+    "properties": {
+        "description": "Loads all sales CSV files from Blob into Azure SQL DB daily",
+        "activities": [
+            {
+                "name": "Get CSV file list",
+                "type": "GetMetadata",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "ds_csv_raw_sales",
+                        "type": "DatasetReference"
+                    },
+                    "fieldList": [
+                        "childItems"
+                    ],
+                    "storeSettings": {
+                        "type": "AzureBlobStorageReadSettings",
+                        "recursive": true,
+                        "enablePartitionDiscovery": false
+                    },
+                    "formatSettings": {
+                        "type": "DelimitedTextReadSettings"
+                    }
+                }
+            },
+            {
+                "name": "ForEach1",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "Get CSV file list",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get CSV file list').output.childItems",
+                        "type": "Expression"
+                    },
+                    "batchCount": 3,
+                    "activities": [
+                        {
+                            "name": "Copy CSV to SQL",
+                            "type": "Copy",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageReadSettings",
+                                        "recursive": true,
+                                        "wildcardFileName": "*.csv",
+                                        "enablePartitionDiscovery": false
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "AzureSqlSink",
+                                    "preCopyScript": "TRUNCATE TABLE fact_sales",
+                                    "writeBehavior": "upsert",
+                                    "upsertSettings": {
+                                        "useTempDB": true,
+                                        "keys": [
+                                            "transaction_id"
+                                        ]
+                                    },
+                                    "sqlWriterUseTableLock": false,
+                                    "disableMetricsCollection": false
+                                },
+                                "enableStaging": false,
+                                "translator": {
+                                    "type": "TabularTranslator",
+                                    "mappings": [
+                                        {
+                                            "source": {
+                                                "name": "transaction_id",
+                                                "type": "String",
+                                                "physicalType": "String"
+                                            },
+                                            "sink": {
+                                                "name": "transaction_id",
+                                                "type": "String",
+                                                "physicalType": "varchar"
+                                            }
+                                        },
+                                        {
+                                            "source": {
+                                                "name": "date",
+                                                "type": "String",
+                                                "physicalType": "String"
+                                            },
+                                            "sink": {
+                                                "name": "sale_date",
+                                                "type": "Date",
+                                                "physicalType": "date"
+                                            }
+                                        },
+                                        {
+                                            "source": {
+                                                "name": "quantity",
+                                                "type": "String",
+                                                "physicalType": "String"
+                                            },
+                                            "sink": {
+                                                "name": "quantity",
+                                                "type": "Int32",
+                                                "physicalType": "int"
+                                            }
+                                        },
+                                        {
+                                            "source": {
+                                                "name": "unit_price",
+                                                "type": "String",
+                                                "physicalType": "String"
+                                            },
+                                            "sink": {
+                                                "name": "unit_price",
+                                                "type": "Decimal",
+                                                "physicalType": "decimal",
+                                                "scale": 2,
+                                                "precision": 10
+                                            }
+                                        },
+                                        {
+                                            "source": {
+                                                "name": "customer_id",
+                                                "type": "String",
+                                                "physicalType": "String"
+                                            },
+                                            "sink": {
+                                                "name": "customer_id",
+                                                "type": "String",
+                                                "physicalType": "varchar"
+                                            }
+                                        },
+                                        {
+                                            "source": {
+                                                "name": "product_name"
+                                            },
+                                            "sink": {
+                                                "name": "product_name"
+                                            }
+                                        },
+                                        {
+                                            "source": {
+                                                "name": "category"
+                                            },
+                                            "sink": {
+                                                "name": "category"
+                                            }
+                                        },
+                                        {
+                                            "source": {
+                                                "name": "region"
+                                            },
+                                            "sink": {
+                                                "name": "region_name"
+                                            }
+                                        }
+                                    ],
+                                    "typeConversion": true,
+                                    "typeConversionSettings": {
+                                        "allowDataTruncation": true,
+                                        "treatBooleanAsNumber": false
+                                    }
+                                }
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "ds_csv_raw_sales",
+                                    "type": "DatasetReference"
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "ds_sql_fact_sales",
+                                    "type": "DatasetReference"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2026-04-26T07:23:22Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
